@@ -53,7 +53,7 @@ func (c *Closer) Close(ctx context.Context) error {
 	for _, f := range c.funcs[c.i:] {
 		wg.Add(1)
 
-		execF(ctx, f, &wg, fErrChan)
+		go execF(ctx, f, &wg, fErrChan)
 	}
 
 	wg.Wait()
