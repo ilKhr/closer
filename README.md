@@ -1,4 +1,6 @@
 # Closer
+[![Test][github-actions-ci-image]][github-actions-ci-url]
+[![Tag Version][tag-version-image]][tag-version-url]
 
 **Closer** is a Go package that provides a mechanism for managing the closing of multiple functions in a controlled and concurrency-safe manner. The package allows you to add functions that should be executed upon closing and then close them one by one or all at once.
 
@@ -94,3 +96,9 @@ Khorishko Ilya
 ### Contributing
 
 Contributions are welcome! Please create an issue or pull request on GitHub.
+
+
+[github-actions-ci-image]: https://badgen.net/github/checks/ilKhr/closer/main/test
+[github-actions-ci-url]: https://github.com/ilKhr/closer/actions/workflows/test.yml
+[tag-version-image]: https://badgen.net/github/tag/ilKhr/closer
+[tag-version-url]: https://badgen.net/github/tag/ilKhr/closer
