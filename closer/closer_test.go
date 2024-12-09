@@ -1,4 +1,4 @@
-package closer_test
+package closer
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ilKhr/closer"
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,7 +45,7 @@ func Test_Size_HappyPath(t *testing.T) {
 
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -64,7 +63,7 @@ func Test_CancelOne_CancelWithCtxPath(t *testing.T) {
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
 
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -88,7 +87,7 @@ func Test_CancelOne_HappyPath(t *testing.T) {
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
 
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -109,7 +108,7 @@ func Test_CancelOne_CallMoreThanHasFuncsPath(t *testing.T) {
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
 
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -121,7 +120,7 @@ func Test_CancelOne_CallMoreThanHasFuncsPath(t *testing.T) {
 
 			err := cl.CloseOne(context.Background())
 
-			require.ErrorContains(t, err, closer.ErrAllServicesClosed)
+			require.ErrorContains(t, err, ErrAllServicesClosed)
 		})
 	}
 }
@@ -132,7 +131,7 @@ func Test_Cancel_HappyPath(t *testing.T) {
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
 
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -145,14 +144,14 @@ func Test_Cancel_HappyPath(t *testing.T) {
 			}
 
 			if len(test.mocks) == 0 {
-				require.ErrorContains(t, err, closer.ErrAllServicesClosed)
+				require.ErrorContains(t, err, ErrAllServicesClosed)
 			} else {
 				require.NoError(t, err)
 			}
 
 			errCloseOne := cl.CloseOne(context.Background())
 
-			require.ErrorContains(t, errCloseOne, closer.ErrAllServicesClosed)
+			require.ErrorContains(t, errCloseOne, ErrAllServicesClosed)
 		})
 	}
 }
@@ -163,7 +162,7 @@ func Test_Cancel_CallMoreThanHasFuncsPath(t *testing.T) {
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
 
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -179,11 +178,11 @@ func Test_Cancel_CallMoreThanHasFuncsPath(t *testing.T) {
 
 			errCloseOne := cl.CloseOne(context.Background())
 
-			require.ErrorContains(t, err, closer.ErrAllServicesClosed)
+			require.ErrorContains(t, err, ErrAllServicesClosed)
 
-			require.ErrorContains(t, err, closer.ErrAllServicesClosed)
+			require.ErrorContains(t, err, ErrAllServicesClosed)
 
-			require.ErrorContains(t, errCloseOne, closer.ErrAllServicesClosed)
+			require.ErrorContains(t, errCloseOne, ErrAllServicesClosed)
 		})
 	}
 }
@@ -194,7 +193,7 @@ func Test_Cancel_CancelWithCtxPath(t *testing.T) {
 	for i, test := range sizeTestCases {
 		t.Run(fmt.Sprintf("Close_function_count_%d", i), func(t *testing.T) {
 
-			var cl closer.Closer
+			var cl Closer
 
 			for _, mcf := range test.mocks {
 				cl.Add(mcf.close)
@@ -212,18 +211,18 @@ func Test_Cancel_CancelWithCtxPath(t *testing.T) {
 			}
 
 			if len(test.mocks) == 0 {
-				require.ErrorContains(t, err, closer.ErrAllServicesClosed)
+				require.ErrorContains(t, err, ErrAllServicesClosed)
 			} else {
 				require.ErrorContains(t, err, context.Canceled.Error())
 			}
 
-			require.ErrorContains(t, errCloseOne, closer.ErrAllServicesClosed)
+			require.ErrorContains(t, errCloseOne, ErrAllServicesClosed)
 		})
 	}
 }
 
 func Test_CloseOne_MultiThreadedPath(t *testing.T) {
-	var cl closer.Closer
+	var cl Closer
 	mocks := []*mockCloseFunc{{}, {}, {}}
 
 	for _, mcf := range mocks {
@@ -247,7 +246,7 @@ func Test_CloseOne_MultiThreadedPath(t *testing.T) {
 }
 
 func Test_CloseOne_MultiThreaded_CancelWithCtxPath(t *testing.T) {
-	var cl closer.Closer
+	var cl Closer
 	mocks := []*mockCloseFunc{{}, {}, {}}
 
 	for _, mcf := range mocks {

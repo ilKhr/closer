@@ -41,30 +41,33 @@ func (c *Closer) Close(ctx context.Context) error {
 		return fmt.Errorf("%s: %v", op, ErrAllServicesClosed)
 	}
 
+	length := c.size - c.i
+
 	var (
-		fErrorChanels = make([]<-chan error, 0, c.size) // Error channels for each function
-		fErrors       = make([]string, 0, c.size)       // List of errors
-		wg            sync.WaitGroup                    // Wait group for concurrent operations
+		fErrChan = make(chan error, length)  // Error channels for each function
+		fErrors  = make([]string, 0, length) // List of errors
+		wg       sync.WaitGroup              // Wait group for concurrent operations
 	)
 
 	// Run each function to close it in a separate goroutine
 	for _, f := range c.funcs[c.i:] {
 		wg.Add(1)
 
-		fErrChan := execF(ctx, f, &wg)
-
-		// Append the error channel to the list
-		fErrorChanels = append(fErrorChanels, fErrChan)
+		execF(ctx, f, &wg, fErrChan)
 	}
 
 	wg.Wait()
 
 	// Collect all errors from the channels
-	for _, el := range fErrorChanels {
-		for err := range el {
+
+	for range length {
+		select {
+		case err := <-fErrChan:
 			if err != nil {
 				fErrors = append(fErrors, err.Error())
 			}
+		default:
+			break
 		}
 	}
 
@@ -114,23 +117,21 @@ func (c *Closer) Size() int {
 }
 
 // execF runs a function in a goroutine and returns a channel to receive any error.
-func execF(ctx context.Context, f Func, wg *sync.WaitGroup) <-chan error {
-	errCh := make(chan error, 1)
+func execF(ctx context.Context, f Func, wg *sync.WaitGroup, errCh chan<- error) {
+	defer wg.Done()
 
-	go func(ctx context.Context, f Func, wg *sync.WaitGroup, errCh chan<- error) {
-		defer wg.Done()
-		defer close(errCh)
+	// Execute the function and send any error to the channel
+	err := f(ctx)
 
-		// Execute the function and send any error to the channel
-		err := f(ctx)
+	if err != nil {
+		errCh <- err
+	}
+}
 
-		if err != nil {
-			errCh <- err
-		}
-
-	}(ctx, f, wg, errCh)
-
-	return errCh
+func (c *Closer) reset() {
+	c.mu.Lock()
+	c.i = 0
+	c.mu.Unlock()
 }
 
 type Func func(ctx context.Context) error
