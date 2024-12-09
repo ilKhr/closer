@@ -98,7 +98,7 @@ Khorishko Ilya
 Contributions are welcome! Please create an issue or pull request on GitHub.
 
 
-[github-actions-ci-image]: https://badgen.net/github/checks/ilKhr/closer/main/test
+[github-actions-ci-image]: https://badgen.net/github/checks/ilKhr/closer/main
 [github-actions-ci-url]: https://github.com/ilKhr/closer/actions/workflows/test.yml
 [tag-version-image]: https://badgen.net/github/tag/ilKhr/closer
 [tag-version-url]: https://badgen.net/github/tag/ilKhr/closer
